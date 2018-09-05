@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+
+
 public class Equalizer : SmartBehaviour
 {
 
@@ -19,22 +21,31 @@ public class Equalizer : SmartBehaviour
 
 
     public float thresholdMultiplier;
-    public GameObject thresholdVisual;
+    public Dictionary<string, ThresholdVisual> thresholdVisuals = new Dictionary<string, ThresholdVisual>();
     // Use this for initialization
     void Start()
     {
-        thresholdVisual = GameObject.Instantiate(cubeEqualizer, transform);
-        thresholdVisual.name = "Debug Slider";
-        thresholdVisual.GetComponent<MeshRenderer>().material.SetFloat("_Equalize", 1);
-        thresholdVisual.GetComponent<MeshRenderer>().material.SetColor("_Color", Color.gray);
-        thresholdVisual.transform.localScale = new Vector3(startScale, 10000, 1);
+        GameObject t0 = Instantiate(cubeEqualizer);
+        t0.AddComponent<ThresholdVisual>().Initialize("mean", Color.grey, startScale, 0);
+        thresholdVisuals.Add("mean", t0.GetComponent<ThresholdVisual>());
+
+        GameObject t1 = Instantiate(cubeEqualizer);
+        t1.AddComponent<ThresholdVisual>().Initialize("stDev1", Color.red, startScale, 1);
+        thresholdVisuals.Add("stDev1", t1.GetComponent<ThresholdVisual>());
+
+        GameObject t2 = Instantiate(cubeEqualizer);
+        t2.AddComponent<ThresholdVisual>().Initialize("stDev2", Color.yellow, startScale, 2);
+        thresholdVisuals.Add("stDev2", t2.GetComponent<ThresholdVisual>());
+
+        GameObject t3 = Instantiate(cubeEqualizer);
+        t3.AddComponent<ThresholdVisual>().Initialize("stDev3", Color.green, startScale, 3);
+        thresholdVisuals.Add("stDev3", t3.GetComponent<ThresholdVisual>());
     }
 
-    private float DetermineThreshold(float sumOfAllBinFrequencies)
+    public float SetThresholdVisual(string visualName, float threshold)
     {
-        float averageFrequency = sumOfAllBinFrequencies / 8192;
-        float threshold = averageFrequency * thresholdMultiplier;
-        SetAndLerpIntensity(ref thresholdVisual, threshold);
+        GameObject thresh = thresholdVisuals[visualName].gameObject;
+        SetAndLerpIntensity(ref thresh, threshold);
         return threshold;
     }
 
@@ -75,7 +86,7 @@ public class Equalizer : SmartBehaviour
             {
                 maxNoteBinCount = item.Value;
             }
-            Debug.Log("Note: " + item.Key + " Frequency:" + pm.Get<FrequencyAnalyzer>().GetFrequencyFromNote(item.Key) + " Bincount: " + item.Value);
+            //Debug.Log("Note: " + item.Key + " Frequency:" + pm.Get<FrequencyAnalyzer>().GetFrequencyFromNote(item.Key) + " Bincount: " + item.Value);
         }
 
         float noteStartPos = 0;
@@ -163,7 +174,7 @@ public class Equalizer : SmartBehaviour
     private Color GetEqualizerBarColor(int i)
     {
         int note = pm.Get<FrequencyAnalyzer>().GetNoteFromBin(i);
-        Debug.Log("note:" + note);
+        //Debug.Log("note:" + note);
         if (note < 0)
         {
             note += 120;
@@ -178,7 +189,6 @@ public class Equalizer : SmartBehaviour
         {
             sumOfFrequenciesInBins += bins[i];
         }
-        float threshold = DetermineThreshold(sumOfFrequenciesInBins);
         if (equalizerCylinders[0] == null)
         {
             //SpawnCylindersInitially();
@@ -202,20 +212,10 @@ public class Equalizer : SmartBehaviour
                 sumOfFrequenciesInBins += bins[item];
             }
 
-            pm.Get<NoteVisualizers>().AddNoteFrequency(notes[i], biggestIntensityInNotesOfBins);
 
             SetAndLerpIntensity(ref equalizerCylinders[i], biggestIntensityInNotesOfBins);
 
-            if (biggestIntensityInNotesOfBins > threshold)
-            {
-                //Debug.Log("Thresh: " + (NOTE_NAMES)((notes[i] + 120) % 12));
-                equalizerCylinders[i].GetComponent<MeshRenderer>().material.SetFloat("_EmmissiveBoost", 5);
-                pm.Get<SongAnalyzer>().AddNoteToSong(notes[i], biggestIntensityInNotesOfBins);
-            }
-            else
-            {
-                equalizerCylinders[i].GetComponent<MeshRenderer>().material.SetFloat("_EmmissiveBoost", 1);
-            }
+            pm.Get<SongAnalyzer>().AddNoteToSong(notes[i], biggestIntensityInNotesOfBins);
         }
     }
 
@@ -257,3 +257,4 @@ public class Equalizer : SmartBehaviour
     }
 
 }
+

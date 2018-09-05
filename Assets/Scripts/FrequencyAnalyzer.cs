@@ -58,13 +58,13 @@ public class FrequencyAnalyzer : SmartSingleton
         {
             pastFrequencies.Add(new float[8192]);
         }
-        File.Delete("debug.txt");
+        //File.Delete("debug.txt");
         for (int i = 0; i < 8192; i++)
         {
             binsToFrequencies[i] = i * hzPerBin;
             string str = "index: " + i + "freq: " + i * hzPerBin + Environment.NewLine;
 
-            File.AppendAllText("debug.txt", str);
+            //File.AppendAllText("debug.txt", str);
         }
         spectrum = new float[8192];
     }
@@ -90,6 +90,8 @@ public class FrequencyAnalyzer : SmartSingleton
 
         pm.Get<Equalizer>().BoostNotesNew(spectrum, vols);
         //pm.Get<Equalizer>().BoostNotes(spectrum, vols);
+
+        pm.Get<SongAnalyzer>().AnalyzeData();
 
         //if (spectralFluxSamplesTreble.Count >= thresholdWindowSize)
         //pm.Get<Equalizer>().BoostNotes(pastFrequencies[pastFrequencies.Index() - thresholdWindowSize], pastOutputData[pastOutputData.Index() - thresholdWindowSize]);

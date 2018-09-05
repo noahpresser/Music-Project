@@ -46,6 +46,10 @@ public class CircleOfFifths
         return 0;
     }
 }
+
+
+
+//generic data, for frame by frame analysis
 public class Note
 {
     public int midiNum;
@@ -92,10 +96,10 @@ public class SongAnalyzer : SmartSingleton
     public void AddNoteToSong(int midiNum, float frequency)
     {
         trackedSongData.AddNote(new Note(midiNum, frequency));
-        DisplayData();
+       
     }
-    private void DisplayData()
+    public void AnalyzeData()
     {
-        currentKey = trackedSongData.key;
+        trackedSongData.Analyze();
     }
 }

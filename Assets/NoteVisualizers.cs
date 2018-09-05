@@ -13,6 +13,7 @@ public class NoteVisualizers : SmartSingleton
     List<GameObject> noteVisualizers = new List<GameObject>();
 
     Dictionary<int, float> notesAndSummedSongFreqencies = new Dictionary<int, float>();
+    Dictionary<int, float> midiNotesAndFrequenciesPure = new Dictionary<int, float>();
 
 
     float totalSummedFrequencies = 0;
@@ -65,15 +66,26 @@ public class NoteVisualizers : SmartSingleton
             noteVisualizers[item.Key].transform.GetChild(0).GetComponent<RectTransform>().sizeDelta = new Vector2(r.width, r.height);
             noteVisualizers[item.Key].transform.GetChild(1).GetComponent<Text>().text = ((NOTE_NAME)(item.Key)).ToString();
         }
+
+        if (oneFrameTrueAllFramesFalse)
+            notesAndSummedSongFreqencies.Clear();
+    }
+    internal void AddNoteFrequencyMidi(int noteNum, float noteFrequency)
+    {
+        if (noteNum < 21)
+            return;
+
+        midiNotesAndFrequenciesPure.Add(noteNum, noteFrequency);
+
     }
 
-    internal void AddNoteFrequency(int noteNum, float noteFrequency)
+    internal void AddNoteFrequency(int noteNum, float noteRelevanve)
     {
         //todo separate this into treble and bass
         int pureNote = (noteNum + 120) % 12;
         if (oneFrameTrueAllFramesFalse)
         {
-            notesAndSummedSongFreqencies[pureNote] = noteFrequency;
+            notesAndSummedSongFreqencies[pureNote] = noteRelevanve;
         }
         else
         {
@@ -81,7 +93,7 @@ public class NoteVisualizers : SmartSingleton
             {
                 notesAndSummedSongFreqencies[pureNote] = 0;
             }
-            notesAndSummedSongFreqencies[pureNote] += noteFrequency;
+            notesAndSummedSongFreqencies[pureNote] += noteRelevanve;
         }
     }
 }
