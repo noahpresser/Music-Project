@@ -147,7 +147,7 @@ public class Equalizer : SmartBehaviour
         {
             //Debug.Log("Notes");
         }
-        int octaveNumber = -1;
+        int octaveNumber = -2;
         GameObject parentOrganizer = new GameObject("first org", typeof(Transform));
         parentOrganizer.transform.parent = transform;
         for (int i = 0; i < notes.Count; i++)

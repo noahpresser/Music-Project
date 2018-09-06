@@ -18,6 +18,12 @@ public class NoteVisualizers : SmartSingleton
 
     float totalSummedFrequencies = 0;
     public bool oneFrameTrueAllFramesFalse = false;
+
+    [Range(24, 88)]
+    public int minNote = 24;
+
+    [Range(24, 88)]
+    public int maxNote = 88;
     void Start()
     {
         noteVisualizerStartPos = noteVisualizerPrefab.GetComponent<Transform>().position;
@@ -38,6 +44,8 @@ public class NoteVisualizers : SmartSingleton
             go.name = ((NOTE_NAME)(i)).ToString();
             go.transform.GetChild(0).GetComponent<Image>().color = pm.Get<HueHelper>("HueHelperTreble").colorsInOrder[i];
             noteVisualizers.Add(go);
+
+            notesAndSummedSongFreqencies[i] = 0;
         }
     }
 
@@ -51,6 +59,7 @@ public class NoteVisualizers : SmartSingleton
         {
             SpawnNoteVisualizers();
         }
+
         foreach (var item in notesAndSummedSongFreqencies)
         {
             totalSummedFrequencies += item.Value;
@@ -68,7 +77,12 @@ public class NoteVisualizers : SmartSingleton
         }
 
         if (oneFrameTrueAllFramesFalse)
-            notesAndSummedSongFreqencies.Clear();
+        {
+            for (int i = 0; i < 12; i++)
+            {
+                notesAndSummedSongFreqencies[i] = 0;
+            }
+        }
     }
     internal void AddNoteFrequencyMidi(int noteNum, float noteFrequency)
     {

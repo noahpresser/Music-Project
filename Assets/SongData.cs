@@ -52,7 +52,8 @@ public class SongData : SmartBehaviour
     public KEY key;
 
     private float songStartTime;
-
+    public float meanFrequencyThisFrame = 0;
+    public float stDevThisFrame = 0;
     List<Note> notesInSong = new List<Note>();
     List<RelevanceData> relevanceData = new List<RelevanceData>();              //data about all "relevant notes" in song
 
@@ -73,11 +74,14 @@ public class SongData : SmartBehaviour
         }
     }
 
-    public void Analyze()
+    public void Analyze(NoteVisualizers noteVisualizer)
     {
-        DetermineRelevantNotes();
-        pm.Get<NoteVisualizers>().UpdateVisualizers();
+        DetermineRelevantNotes(noteVisualizer, noteVisualizer.minNote, noteVisualizer.maxNote);
+        noteVisualizer.UpdateVisualizers();
 
+    }
+    public void ResetFrame()
+    {
         currentFrameNoteData.Clear();
     }
 
@@ -86,10 +90,10 @@ public class SongData : SmartBehaviour
 
     }
 
-    private void DetermineRelevantNotes(int minMidiNote = 24, int MaxMidiNote = 88)
+    private void DetermineRelevantNotes(NoteVisualizers noteVisualizer, int minMidiNote = 24, int MaxMidiNote = 88)
     {
         float meanFrequencyThisFrame = 0;
-        int numNotes = MaxMidiNote - minMidiNote;
+        int numNotes = MaxMidiNote - minMidiNote + 1;
         int countedNumNotes = 0;
 
         List<float> frequenciesThisFrame = new List<float>();
@@ -104,13 +108,13 @@ public class SongData : SmartBehaviour
         }
         meanFrequencyThisFrame /= numNotes;
 
-        float standardDeviation = getStandardDeviation(frequenciesThisFrame, meanFrequencyThisFrame);
+        stDevThisFrame = getStandardDeviation(frequenciesThisFrame, meanFrequencyThisFrame);
 
         pm.Get<Equalizer>().SetThresholdVisual("mean", meanFrequencyThisFrame);
 
-        pm.Get<Equalizer>().SetThresholdVisual("stDev1", meanFrequencyThisFrame + standardDeviation);
-        pm.Get<Equalizer>().SetThresholdVisual("stDev2", meanFrequencyThisFrame + 2 * standardDeviation);
-        pm.Get<Equalizer>().SetThresholdVisual("stDev3", meanFrequencyThisFrame + 3 * standardDeviation);
+        pm.Get<Equalizer>().SetThresholdVisual("stDev1", meanFrequencyThisFrame + stDevThisFrame);
+        pm.Get<Equalizer>().SetThresholdVisual("stDev2", meanFrequencyThisFrame + 2 * stDevThisFrame);
+        pm.Get<Equalizer>().SetThresholdVisual("stDev3", meanFrequencyThisFrame + 3 * stDevThisFrame);
 
         if (countedNumNotes != numNotes)
         {
@@ -120,13 +124,14 @@ public class SongData : SmartBehaviour
         foreach (NoteData noteData in currentFrameNoteData)
         {
             float noteDifferenceFromMean = noteData.frequency - meanFrequencyThisFrame;
-            noteData.SetStandardDeviation(noteDifferenceFromMean / standardDeviation);
+            noteData.SetStandardDeviation(noteDifferenceFromMean / stDevThisFrame);
 
 
-            if (noteData.stDevTotal > (standardDeviation * stDevThreshold))
+            float stDevsAboveMean = ((noteData.frequency - meanFrequencyThisFrame) / stDevThisFrame);
+            if (stDevsAboveMean > stDevThreshold)
             {
                 //do something bleh relevantnotes
-                pm.Get<NoteVisualizers>().AddNoteFrequency(noteData.midiNum, noteData.stDevTotal);
+                noteVisualizer.AddNoteFrequency(noteData.midiNum, noteData.stDevTotal);
             }
         }
 

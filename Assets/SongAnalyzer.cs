@@ -96,10 +96,14 @@ public class SongAnalyzer : SmartSingleton
     public void AddNoteToSong(int midiNum, float frequency)
     {
         trackedSongData.AddNote(new Note(midiNum, frequency));
-       
+
     }
     public void AnalyzeData()
     {
-        trackedSongData.Analyze();
+        foreach (var noteVisualizer in GameObject.FindObjectsOfType<NoteVisualizers>())
+        {
+            trackedSongData.Analyze(noteVisualizer);
+        }
+        trackedSongData.ResetFrame();
     }
 }

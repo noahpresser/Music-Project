@@ -314,7 +314,7 @@ public class FrequencyAnalyzer : SmartSingleton
         int halfStepsToA4 = Mathf.RoundToInt((12 * Mathf.Log(frequency / tuningFreq, 2)));
 
         //c is four half steps above a4 so
-        int noteNum = 69 + halfStepsToA4;
+        int noteNum = 57 + halfStepsToA4;
         return noteNum;
     }
 

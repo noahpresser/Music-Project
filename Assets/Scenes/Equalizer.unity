@@ -467,6 +467,57 @@ MonoBehaviour:
   devicePath: 2
   on: 1
   color: {r: 0.9339623, g: 0.004405493, b: 0.042357206, a: 1}
+--- !u!1 &813945559
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 813945560}
+  - component: {fileID: 813945561}
+  m_Layer: 5
+  m_Name: NoteVisualizersBass
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &813945560
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 813945559}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 156.97331}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.9979385}
+  m_Children: []
+  m_Father: {fileID: 903877659}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -171.05, y: 86}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &813945561
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 813945559}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34556d338e05709449e126a712e5daa3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  noteVisualizerPrefab: {fileID: 1801110610336288, guid: e4440d0c69cd3994fb7d6089b9d322f7,
+    type: 2}
+  noteVisualizerMaxScale: 1000
+  oneFrameTrueAllFramesFalse: 1
+  minNote: 24
+  maxNote: 46
 --- !u!1 &824787229
 GameObject:
   m_ObjectHideFlags: 0
@@ -636,6 +687,7 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 2004498712}
+  - {fileID: 813945560}
   - {fileID: 1256934328}
   m_Father: {fileID: 0}
   m_RootOrder: 5
@@ -913,7 +965,7 @@ GameObject:
   - component: {fileID: 1256934328}
   - component: {fileID: 1256934330}
   m_Layer: 5
-  m_Name: NoteVisualizers
+  m_Name: NoteVisualizersTreble
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -925,16 +977,16 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1256934327}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 156.97}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 156.97331}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.9979385}
   m_Children: []
   m_Father: {fileID: 903877659}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 208.2, y: -107.9}
+  m_AnchoredPosition: {x: 519.4, y: 78.6}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1256934330
@@ -952,6 +1004,8 @@ MonoBehaviour:
     type: 2}
   noteVisualizerMaxScale: 1000
   oneFrameTrueAllFramesFalse: 1
+  minNote: 47
+  maxNote: 88
 --- !u!1 &1605020491
 GameObject:
   m_ObjectHideFlags: 0
@@ -1026,7 +1080,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   key: 0
-  stDevThreshold: 3
+  meanFrequencyThisFrame: 0
+  stDevThisFrame: 0
+  stDevThreshold: 1
 --- !u!4 &1718968964
 Transform:
   m_ObjectHideFlags: 0
