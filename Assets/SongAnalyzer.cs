@@ -100,10 +100,6 @@ public class SongAnalyzer : SmartSingleton
     }
     public void AnalyzeData()
     {
-        foreach (var noteVisualizer in GameObject.FindObjectsOfType<NoteVisualizers>())
-        {
-            trackedSongData.Analyze(noteVisualizer);
-        }
-        trackedSongData.ResetFrame();
+        trackedSongData.Analyze();
     }
 }

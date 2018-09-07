@@ -12,8 +12,9 @@ public class Equalizer : SmartBehaviour
     public GameObject cubeEqualizer;
     public float startScale;
     public float maxScale;
+    public bool showThresholds  = false;
 
-    
+
 
     private int numBins = 8192;
 
@@ -40,6 +41,15 @@ public class Equalizer : SmartBehaviour
         GameObject t3 = Instantiate(cubeEqualizer);
         t3.AddComponent<ThresholdVisual>().Initialize("stDev3", Color.green, startScale, 3);
         thresholdVisuals.Add("stDev3", t3.GetComponent<ThresholdVisual>());
+
+        if (!showThresholds)
+        {
+            foreach (var item in thresholdVisuals)
+            {
+                item.Value.gameObject.SetActive(false);
+                //item.Value.GetComponent<ThresholdVisual>().GetComponent<MeshRenderer>().material.SetColor("_Color", Color.clear);
+            }
+        }
     }
 
     public float SetThresholdVisual(string visualName, float threshold)

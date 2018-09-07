@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-class PriorityQueue<T> where T : IComparable
+public class PriorityQueue<T> where T : IComparable
 {
     private List<T> list;
     public int Count { get { return list.Count; } }

@@ -91,6 +91,7 @@
     <Compile Include="Assets\SongAnalyzer.cs" />
     <Compile Include="Assets\SongData.cs" />
     <Compile Include="Assets\ThresholdVisual.cs" />
+    <Compile Include="Assets\UseVideoForAudio.cs" />
     <Reference Include="Unity.RenderPipelines.Core.Editor">
       <HintPath>C:/Users/envu/Desktop/Personal Projects/Music-Project/Library/ScriptAssemblies/Unity.RenderPipelines.Core.Editor.dll</HintPath>
     </Reference>

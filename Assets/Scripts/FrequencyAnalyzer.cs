@@ -49,7 +49,7 @@ public class FrequencyAnalyzer : SmartSingleton
     private float nextDetectionTime = 0;
     private void Start()
     {
-        if (GetComponent < AudioSource>().clip)
+        if (!GameObject.Find("Video Player"))
         {
             audioClipSampleRate = GetComponent<AudioSource>().clip.frequency;
         }
@@ -74,14 +74,22 @@ public class FrequencyAnalyzer : SmartSingleton
     // Update is called once per frame
     void Update()
     {
-        audioSource.GetSpectrumData(spectrum, 0, FFTWindow.BlackmanHarris);
-        //AudioListener.GetSpectrumData(spectrum, 0, FFTWindow.BlackmanHarris);
+        if (GameObject.Find("Video Player"))
+        {
+            AudioListener.GetSpectrumData(spectrum, 0, FFTWindow.BlackmanHarris);
+        }
+        else
+        {
+            audioSource.GetSpectrumData(spectrum, 0, FFTWindow.BlackmanHarris);
+        }
 
         pastFrequencies.SetAndIncrement(spectrum);
         float[] vols = new float[8192];
 
-        audioSource.GetOutputData(vols, 0);
-        //AudioListener.GetOutputData(vols, 0);
+        if (GameObject.Find("Video Player"))
+            AudioListener.GetOutputData(vols, 0);
+        else
+            audioSource.GetOutputData(vols, 0);
 
         pastOutputData.SetAndIncrement(vols);
 

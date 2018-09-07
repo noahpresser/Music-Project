@@ -9,10 +9,10 @@ public class RelevanceData
     public int midiNum;
     public float frequency;                         //the value at which the note became relevant
     public float relevanceTime;                     //the time the note became relevant
-    public RelevanceData(Note note)
+    public RelevanceData(NoteData note)
     {
         midiNum = note.midiNum;
-        frequency = note.frequencyIntensity;
+        frequency = note.frequency;
         relevanceTime = Time.time;
     }
 }
@@ -46,43 +46,77 @@ public class NoteData
     }
 }
 
+
 public class SongData : SmartBehaviour
 {
+    public class DataPortion
+    {
+        public float previousFrameMeanFrequency = 0;
+        public float currentFrameMeanFrequency = 0;
+        public float stDevThisFrame = 0;
+        public List<RelevanceData> relevanceData = new List<RelevanceData>();              //data about all "relevant notes" in song
+        public Dictionary<int, NoteData> previousFrameNoteData = new Dictionary<int, NoteData>();
+        public Dictionary<int, NoteData> currentFrameNoteData = new Dictionary<int, NoteData>();
+        public PriorityQueue<SortablePair> noteCounts = new PriorityQueue<SortablePair>();
+        public Dictionary<int, SortablePair> noteDict = new Dictionary<int, SortablePair>();
+    }
+
     public Tempo tempo;
     public KEY key;
 
     private float songStartTime;
-    public float meanFrequencyThisFrame = 0;
-    public float stDevThisFrame = 0;
     List<Note> notesInSong = new List<Note>();
-    List<RelevanceData> relevanceData = new List<RelevanceData>();              //data about all "relevant notes" in song
 
+    Dictionary<string, DataPortion> songData = new Dictionary<string, DataPortion>();
 
-    List<NoteData> currentFrameNoteData = new List<NoteData>();
-
-    PriorityQueue<SortablePair> noteCounts = new PriorityQueue<SortablePair>();
-    Dictionary<int, SortablePair> noteDict = new Dictionary<int, SortablePair>();
 
     public float stDevThreshold = 2;
+    private List<NoteVisualizers> allNoteVisualizers = new List<NoteVisualizers>();
 
     void Start()
     {
-        for (int i = -1; i < 12; i++)
+        foreach (var item in GameObject.FindObjectsOfType<NoteVisualizers>())
         {
-            SortablePair s = new SortablePair(i, 0);
-            noteDict[i] = s;
+            if (item.gameObject.activeInHierarchy)
+            {
+                allNoteVisualizers.Add(item);
+            }
+        }
+        foreach (var item in allNoteVisualizers)
+        {
+            songData[item.name] = new DataPortion();
+            for (int i = -1; i < 12; i++)
+            {
+                SortablePair s = new SortablePair(i, 0);
+                songData[item.name].noteDict[i] = s;
+            }
         }
     }
 
-    public void Analyze(NoteVisualizers noteVisualizer)
+    public void Analyze()
     {
-        DetermineRelevantNotes(noteVisualizer, noteVisualizer.minNote, noteVisualizer.maxNote);
-        noteVisualizer.UpdateVisualizers();
-
+        foreach (NoteVisualizers noteVisual in allNoteVisualizers)
+        {
+            DetermineRelevantNotes(noteVisual, noteVisual.minNote, noteVisual.maxNote);
+            noteVisual.UpdateVisualizers();
+        }
+        ResetFrame();
     }
     public void ResetFrame()
     {
-        currentFrameNoteData.Clear();
+        //deep copy
+        foreach (NoteVisualizers noteVisual in allNoteVisualizers)
+        {
+            DataPortion dp = songData[noteVisual.name];
+            foreach (var item in dp.currentFrameNoteData)
+            {
+                dp.previousFrameNoteData[item.Key] = item.Value;
+            }
+            dp.currentFrameNoteData.Clear();
+            dp.previousFrameMeanFrequency = dp.currentFrameMeanFrequency;
+            dp.currentFrameMeanFrequency = 0;
+        }
+
     }
 
     private void SetThresholdVisuals()
@@ -92,46 +126,73 @@ public class SongData : SmartBehaviour
 
     private void DetermineRelevantNotes(NoteVisualizers noteVisualizer, int minMidiNote = 24, int MaxMidiNote = 88)
     {
-        float meanFrequencyThisFrame = 0;
+        DataPortion dp = songData[noteVisualizer.name];
         int numNotes = MaxMidiNote - minMidiNote + 1;
         int countedNumNotes = 0;
 
         List<float> frequenciesThisFrame = new List<float>();
-        foreach (NoteData noteData in currentFrameNoteData)
+        foreach (var noteDataPair in dp.currentFrameNoteData)
         {
+            NoteData noteData = noteDataPair.Value;
             if ((noteData.midiNum < minMidiNote) || (noteData.midiNum > MaxMidiNote))
                 continue;
 
-            meanFrequencyThisFrame += noteData.frequency;
+            dp.currentFrameMeanFrequency += noteData.frequency;
             countedNumNotes++;
             frequenciesThisFrame.Add(noteData.frequency);
         }
-        meanFrequencyThisFrame /= numNotes;
+        dp.currentFrameMeanFrequency /= numNotes;
 
-        stDevThisFrame = getStandardDeviation(frequenciesThisFrame, meanFrequencyThisFrame);
+        dp.stDevThisFrame = getStandardDeviation(frequenciesThisFrame, dp.currentFrameMeanFrequency);
 
-        pm.Get<Equalizer>().SetThresholdVisual("mean", meanFrequencyThisFrame);
+        pm.Get<Equalizer>().SetThresholdVisual("mean", dp.currentFrameMeanFrequency);
 
-        pm.Get<Equalizer>().SetThresholdVisual("stDev1", meanFrequencyThisFrame + stDevThisFrame);
-        pm.Get<Equalizer>().SetThresholdVisual("stDev2", meanFrequencyThisFrame + 2 * stDevThisFrame);
-        pm.Get<Equalizer>().SetThresholdVisual("stDev3", meanFrequencyThisFrame + 3 * stDevThisFrame);
+        pm.Get<Equalizer>().SetThresholdVisual("stDev1", dp.currentFrameMeanFrequency + dp.stDevThisFrame);
+        pm.Get<Equalizer>().SetThresholdVisual("stDev2", dp.currentFrameMeanFrequency + 2 * dp.stDevThisFrame);
+        pm.Get<Equalizer>().SetThresholdVisual("stDev3", dp.currentFrameMeanFrequency + 3 * dp.stDevThisFrame);
 
         if (countedNumNotes != numNotes)
         {
             Debug.LogError("COUNTED NUM NOTES DOES NOT MATCH ACTUAL NUM NOTES, counted: " + countedNumNotes + "num: " + numNotes);
         }
 
-        foreach (NoteData noteData in currentFrameNoteData)
+        foreach (var noteDataPair in dp.currentFrameNoteData)
         {
-            float noteDifferenceFromMean = noteData.frequency - meanFrequencyThisFrame;
-            noteData.SetStandardDeviation(noteDifferenceFromMean / stDevThisFrame);
+            if ((noteDataPair.Key < minMidiNote) || (noteDataPair.Key > MaxMidiNote))
+                continue;
+
+            NoteData noteData = noteDataPair.Value;
+            float noteDifferenceFromMean = noteData.frequency - dp.currentFrameMeanFrequency;
+            noteData.SetStandardDeviation(noteDifferenceFromMean / dp.stDevThisFrame);
 
 
-            float stDevsAboveMean = ((noteData.frequency - meanFrequencyThisFrame) / stDevThisFrame);
-            if (stDevsAboveMean > stDevThreshold)
+            if (IsRelevant(noteData, dp, dp.currentFrameMeanFrequency))
             {
                 //do something bleh relevantnotes
                 noteVisualizer.AddNoteFrequency(noteData.midiNum, noteData.stDevTotal);
+                AddRelevanceData(noteVisualizer, noteDataPair);
+            }
+        }
+
+    }
+
+    private bool IsRelevant(NoteData noteData, DataPortion dp, float meanFrequency)
+    {
+        float stDevsAboveMean = ((noteData.frequency - meanFrequency) / dp.stDevThisFrame);
+        return stDevsAboveMean > stDevThreshold;
+
+    }
+    private void AddRelevanceData(NoteVisualizers noteVisual, KeyValuePair<int, NoteData> noteDataPair)
+    {
+        DataPortion dp = songData[noteVisual.name];
+        //if note was not relevant last frame, add it to the list of relevance data for this frame
+        if (dp.previousFrameNoteData.Count == dp.currentFrameNoteData.Count)
+        {
+            NoteData previousFrameNoteData = dp.previousFrameNoteData[noteDataPair.Key];
+            if (!IsRelevant(previousFrameNoteData, dp, dp.previousFrameMeanFrequency))
+            {
+                RelevanceData r = new RelevanceData(noteDataPair.Value);
+                Debug.Log("New relevant Note: " + noteVisual.name + " Note name: " + noteDataPair.Value.midiNum  + " | " + ((NOTE_NAME)((noteDataPair.Key + 120) % 12)) + " Time: " + Time.time);
             }
         }
 
@@ -150,12 +211,15 @@ public class SongData : SmartBehaviour
 
     public void AddNote(Note newNote)
     {
-        if (currentFrameNoteData == null)
-            currentFrameNoteData = new List<NoteData>();
+        foreach (var noteVisualizer in allNoteVisualizers)
+        {
+            DataPortion dp = songData[noteVisualizer.name];
+            if (dp.currentFrameNoteData == null)
+                dp.currentFrameNoteData = new Dictionary<int, NoteData>();
+            NoteData newNoteData = new NoteData(newNote.midiNum, newNote.frequencyIntensity);
+            dp.currentFrameNoteData[newNoteData.midiNum] = newNoteData;
 
-        NoteData newNoteData = new NoteData(newNote.midiNum, newNote.frequencyIntensity);
-        currentFrameNoteData.Add(newNoteData);
-
+        }
 
 
 
@@ -200,30 +264,32 @@ public class SongData : SmartBehaviour
     }
     private List<NOTE_NAME> RankNotes()
     {
-        noteCounts.Clear();
-        foreach (var item in noteDict)
-        {
-            if (item.Key == -1)
-            {
-                continue;
-            }
-            noteCounts.Enqueue(item.Value);
-        }
 
-        string str = "Sorted :\n";
-        Dictionary<int, int> rankings = new Dictionary<int, int>();
-        List<NOTE_NAME> rankedNotes = new List<NOTE_NAME>();
-        int index = noteCounts.Count - 1;
+        //noteCounts.Clear();
+        //foreach (var item in noteDict)
+        //{
+        //    if (item.Key == -1)
+        //    {
+        //        continue;
+        //    }
+        //    noteCounts.Enqueue(item.Value);
+        //}
 
-        SortablePair s = noteCounts.Peek();
-        while (noteCounts.Count > 0)
-        {
-            s = noteCounts.Dequeue();
-            rankedNotes.Insert(0, (NOTE_NAME)s.note);
-            str += (NOTE_NAME)s.note + " " + s.count + " || ";
-        }
-        //Debug.Log(str);
-        return rankedNotes;
+        //string str = "Sorted :\n";
+        //Dictionary<int, int> rankings = new Dictionary<int, int>();
+        //List<NOTE_NAME> rankedNotes = new List<NOTE_NAME>();
+        //int index = noteCounts.Count - 1;
+
+        //SortablePair s = noteCounts.Peek();
+        //while (noteCounts.Count > 0)
+        //{
+        //    s = noteCounts.Dequeue();
+        //    rankedNotes.Insert(0, (NOTE_NAME)s.note);
+        //    str += (NOTE_NAME)s.note + " " + s.count + " || ";
+        //}
+        ////Debug.Log(str);
+        //return rankedNotes;
+        throw new NotImplementedException();
     }
     private void DetermineBassAndTrebleNotes()
     {
