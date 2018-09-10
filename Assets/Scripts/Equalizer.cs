@@ -67,6 +67,7 @@ public class Equalizer : SmartBehaviour
 
             Color equalizerBarColor = GetEqualizerBarColor(i);
             equalizerCylinders[i].GetComponent<MeshRenderer>().material.SetColor("_Color", equalizerBarColor);
+            equalizerCylinders[i].GetComponent<MeshRenderer>().material.SetColor("_EmissionColor", equalizerBarColor);
             Vector3 spawnPos = new Vector3(i * cubeEqualizer.GetComponent<MeshRenderer>().bounds.extents.x * 6, transform.position.y, transform.position.z);
             equalizerCylinders[i].transform.position = spawnPos;
             equalizerCylinders[i].transform.localScale = new Vector3(startScale, transform.localScale.y, transform.localScale.z);

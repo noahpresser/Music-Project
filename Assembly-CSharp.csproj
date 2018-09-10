@@ -61,6 +61,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Fork Particle Variety Pack FX\Assets\Scripts\ForkAPI\CanvasButtonController.cs" />
+    <Compile Include="Assets\Fork Particle Variety Pack FX\Assets\Scripts\ForkAPI\ForkParticleEffect.cs" />
+    <Compile Include="Assets\Fork Particle Variety Pack FX\Assets\Scripts\ForkAPI\ForkParticlePlugin.cs" />
+    <Compile Include="Assets\Fork Particle Variety Pack FX\Assets\Scripts\ForkAPI\PSBAsset.cs" />
     <Compile Include="Assets\FPS Counter Assets\Scripts\DemoCube.cs" />
     <Compile Include="Assets\FPS Counter Assets\Scripts\FPSCounter.cs" />
     <Compile Include="Assets\Hue 1\Scripts\HueBridge.cs" />
@@ -90,8 +94,39 @@
     <Compile Include="Assets\Scripts\UtilLibrary.cs" />
     <Compile Include="Assets\SongAnalyzer.cs" />
     <Compile Include="Assets\SongData.cs" />
+    <Compile Include="Assets\SpriteLights\Scripts\CityLights.cs" />
+    <Compile Include="Assets\SpriteLights\Scripts\LookAround.cs" />
+    <Compile Include="Assets\SpriteLights\Scripts\Math3d.cs" />
+    <Compile Include="Assets\SpriteLights\Scripts\RandomLights.cs" />
+    <Compile Include="Assets\SpriteLights\Scripts\ReferenceDistance.cs" />
+    <Compile Include="Assets\SpriteLights\Scripts\RunwayLights.cs" />
+    <Compile Include="Assets\SpriteLights\Scripts\SpriteLights.cs" />
     <Compile Include="Assets\ThresholdVisual.cs" />
     <Compile Include="Assets\UseVideoForAudio.cs" />
+    <None Include="Assets\Resources\ALSF2.txt" />
+    <None Include="Assets\Resources\ALSF1.txt" />
+    <None Include="Assets\Fork Particle Variety Pack FX\Assets\Resources\ForkFX\Cartoon_Blast_PSK.xml" />
+    <None Include="Assets\Fork Particle Variety Pack FX\Assets\Resources\ForkFX\Firework_Celebretion_PSK.xml" />
+    <None Include="Assets\SpriteLights\Shaders\lightFunctions.cginc" />
+    <None Include="Assets\SpriteLights\Shaders\omnidirectionalLight.shader" />
+    <None Include="Assets\SpriteLights\Shaders\papiLight.shader" />
+    <None Include="Assets\Fork Particle Variety Pack FX\Assets\Resources\ForkFX\Confetti_Cartoon_PSK.xml" />
+    <None Include="Assets\Fork Particle Variety Pack FX\Assets\Resources\ForkFX\ForkParticle.shader" />
+    <None Include="Assets\Resources\SALS.txt" />
+    <None Include="Assets\Fork Particle Variety Pack FX\Assets\Resources\ForkFX\Stylized_Blast_PSK.xml" />
+    <None Include="Assets\SpriteLights\Manual\changelog.txt" />
+    <None Include="Assets\SpriteLights\Shaders\strobeLight.shader" />
+    <None Include="Assets\Resources\CALVERT1.txt" />
+    <None Include="Assets\Resources\CALVERT2.txt" />
+    <None Include="Assets\Fork Particle Variety Pack FX\Assets\Resources\ForkFX\Magic_Twister_PSK.xml" />
+    <None Include="Assets\SpriteLights\Shaders\directionalLight.shader" />
+    <None Include="Assets\Fork Particle Variety Pack FX\Assets\Resources\ForkFX\Snow_Cartoon_PSK.xml" />
+    <None Include="Assets\Fork Particle Variety Pack FX\Assets\Resources\ForkFX\Magic_Spiral_PSK.xml" />
+    <None Include="Assets\Resources\TDZ.txt" />
+    <None Include="Assets\Fork Particle Variety Pack FX\Assets\Resources\ForkFX\Stylized_Space_Explosion_PSK.xml" />
+    <None Include="Assets\Fork Particle Variety Pack FX\Assets\Resources\ForkFX\Alien_Fire_PSK.xml" />
+    <None Include="Assets\Fork Particle Variety Pack FX\Assets\Resources\ForkFX\Thunder_Cloud_PSK.xml" />
+    <None Include="Assets\SpriteLights\Shaders\debugLight.shader" />
     <Reference Include="Unity.RenderPipelines.Core.Editor">
       <HintPath>C:/Users/envu/Desktop/Personal Projects/Music-Project/Library/ScriptAssemblies/Unity.RenderPipelines.Core.Editor.dll</HintPath>
     </Reference>
@@ -356,6 +391,12 @@
     <Reference Include="Boo.Lang">
       <HintPath>C:/Program Files/Unity 2018.2/Editor/Data/MonoBleedingEdge/lib/mono/unity/Boo.Lang.dll</HintPath>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="Assembly-CSharp-firstpass.csproj">
+      <Project>{D682B459-B521-A1AA-6669-21302B57CABA}</Project>
+      <Name>Assembly-CSharp-firstpass</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />
